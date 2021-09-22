@@ -72,7 +72,7 @@ def gen_statistic(input_text):
 
 
 @time_decorator
-def gen_str(dict_input):
+def gen_str(dict_input, input_text_len):
     statistic_str = ""
 
     for item in dict_input.items():
@@ -80,20 +80,17 @@ def gen_str(dict_input):
             title = "enter"
         elif item[0] == 9:
             title = "tab"
-        elif (
-            item[0] == 10
-            or item[0] == 128
-            or item[0] == 147
-            or item[0] == 90
-            or item[0] == 194
-        ):
+        elif item[0] == 32:
+            title = "space"
+        elif item[0] == 10 or item[0] == 147 or item[0] == 90 or item[0] == 194:
             continue
         else:
             title = chr(item[0])
 
         statistic_str += title + ": " + str(item[1]) + "\n"
 
-    statistic_str += str(len(dict_input))
+    statistic_str += "\nnumber of input chars: " + str(input_text_len)
+    statistic_str += "\nnumber of different chars: " + str(len(dict_input))
     return statistic_str
 
 
@@ -115,7 +112,7 @@ def main():
     if input_text:
         result = gen_statistic(input_text)
         if print_statistic_to_console:
-            print(gen_str(result))
+            print(gen_str(dict_input=result, input_text_len=len(input_text)))
         if show_matplotlib_visualisation:
             matplotlib_visualisation(result)
 
