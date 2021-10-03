@@ -1,13 +1,12 @@
 import os
-from typing import Counter
-
 import numpy as np
 
+from typing import Counter
 from matplotlib import pyplot as plt
 from datetime import datetime
 
 from config import *
-
+from initialize_logger import error_logger, info_logger
 
 def time_decorator(func):
     def wrapper(*args, **kwargs):
@@ -15,11 +14,11 @@ def time_decorator(func):
         result = func(*args, **kwargs)
         if print_time_for_main_only and time_decorator_work:
             if func.__name__ == "main":
-                print(
+                info_logger.info(
                     str(datetime.now() - start_time).split(":")[2] + " " + func.__name__
                 )
         elif time_decorator_work:
-            print(str(datetime.now() - start_time).split(":")[2] + " " + func.__name__)
+            info_logger.info(str(datetime.now() - start_time).split(":")[2] + " " + func.__name__)
 
         return result
 
@@ -33,13 +32,13 @@ def open_file():
         input_data.append(os.listdir(input_text_path)[0])
         input_text_file = input_data[0]
     except IndexError:
-        print(f"Put some files in {input_text_path} folder")
+        error_logger.error(f"Put some files in {input_text_path} folder")
     except FileNotFoundError:
-        print(f"There is not {input_text_path} folder. Create it")
+        error_logger.error(f"There is not {input_text_path} folder. Create it")
     except:
-        print("Incorrect input data")
+        error_logger.error("Incorrect input data")
 
-    if input_text_file:
+    if input_data:
         splited_input_text_file = input_text_file.split(".")
         if splited_input_text_file[len(splited_input_text_file) - 1] == "txt":
             try:
@@ -48,22 +47,21 @@ def open_file():
                 )
                 input_text = input_data[1]
                 if len(input_text) > 2:
-                    print(f"{input_text_path}/{input_text_file} opened successfuly")
+                    info_logger.info(f"{input_text_path}/{input_text_file} opened successfuly")
                     return input_data
                 else:
-                    print("the entered text must be at least 3 characters")
+                    error_logger.error("the entered text must be at least 3 characters")
 
             except FileNotFoundError:
-                print("FileNotFoundError")
+                error_logger.error("FileNotFoundError")
             except:
-                print("Incorrect input file")
+                error_logger.error("Incorrect input file")
         else:
-            print("Incorrect input file format. It must be in .txt format")
+            error_logger.error("Incorrect input file format. It must be in .txt format")
 
 
 @time_decorator
 def gen_statistic(input_text):
-    print(len(input_text))
     statistic = Counter(input_text)
     statistic_sorted = dict(
         sorted(statistic.items(), key=lambda item: item[1], reverse=True)
@@ -143,8 +141,8 @@ def matplotlib_visualisation(
     ax.grid(linestyle="dashed", linewidth=1)
     if save_statistic_visualisation:
         plt.savefig(f"statistic_visualisations/{file_name}_statistic_visualisation.jpg")
-
-    plt.show()
+    if show_statistic_visualisation:
+        plt.show()
 
 
 @time_decorator
@@ -154,11 +152,11 @@ def main():
         result = gen_statistic(input_data[1])
         if print_statistic_to_console:
             print(gen_str(dict_input=result, input_text_len=len(input_data[1])))
-        if show_statistic_visualisation:
+        if calculate_statistic_visualisation:
             matplotlib_visualisation(
                 result,
                 input_data[0],
-                num_of_horizontal_divisions=40,
+                num_of_horizontal_divisions=44,
                 num_of_vertical_divisions=40,
             )
 
