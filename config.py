@@ -3,6 +3,8 @@
 input_text_path = "input_text"
 
 print_statistic_to_console = True
+
+calculate_statistic_visualisation = True
 show_statistic_visualisation = True
 save_statistic_visualisation = True
 
