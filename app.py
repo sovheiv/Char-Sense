@@ -1,4 +1,3 @@
-import logging
 import os
 import numpy as np
 
@@ -92,7 +91,7 @@ def gen_statistic(input_text):
 
         if round(item[1] / len(input_text) * 100, 2) > 0.001:
             statistic_sorted_corrected[title] = round(
-                item[1] / len(input_text) * 100, 5
+                item[1] / len(input_text) * 100, 3
             )
 
     return statistic_sorted_corrected
@@ -103,8 +102,8 @@ def gen_str(dict_input, input_text_len):
     statistic_str = "statistic\n"
     i = 0
     for item in dict_input.items():
-        statistic_str += f"{i}) {item[0]}: {item[1]} \n"
         i += 1
+        statistic_str += f"{i}) {item[0]}: {item[1]} \n"
 
     statistic_str += "number of input chars: " + str(input_text_len) + "\n"
     statistic_str += "number of different chars: " + str(len(dict_input)) + "\n"
@@ -152,6 +151,7 @@ def matplotlib_visualisation(
     ax.bar(str_data, int_data, color="#5e1f82")
     ax.grid(linestyle="dashed", linewidth=1)
     if save_statistic_visualisation:
+        os.makedirs("statistic_visualisations", exist_ok=True)
         plt.savefig(f"statistic_visualisations/{file_name}_statistic_visualisation.jpg")
     if show_statistic_visualisation:
         plt.show()
