@@ -1,3 +1,4 @@
+import logging
 import os
 import numpy as np
 
@@ -6,7 +7,8 @@ from matplotlib import pyplot as plt
 from datetime import datetime
 
 from config import *
-from initialize_logger import error_logger, info_logger
+from initialize_logger import output_logger
+
 
 def time_decorator(func):
     def wrapper(*args, **kwargs):
@@ -14,11 +16,13 @@ def time_decorator(func):
         result = func(*args, **kwargs)
         if print_time_for_main_only and time_decorator_work:
             if func.__name__ == "main":
-                info_logger.info(
+                output_logger.info(
                     str(datetime.now() - start_time).split(":")[2] + " " + func.__name__
                 )
         elif time_decorator_work:
-            info_logger.info(str(datetime.now() - start_time).split(":")[2] + " " + func.__name__)
+            output_logger.info(
+                str(datetime.now() - start_time).split(":")[2] + " " + func.__name__
+            )
 
         return result
 
@@ -32,11 +36,11 @@ def open_file():
         input_data.append(os.listdir(input_text_path)[0])
         input_text_file = input_data[0]
     except IndexError:
-        error_logger.error(f"Put some files in {input_text_path} folder")
+        output_logger.error(f"Put some files in {input_text_path} folder")
     except FileNotFoundError:
-        error_logger.error(f"There is not {input_text_path} folder. Create it")
+        output_logger.error(f"There is not {input_text_path} folder. Create it")
     except:
-        error_logger.error("Incorrect input data")
+        output_logger.error("Incorrect input data")
 
     if input_data:
         splited_input_text_file = input_text_file.split(".")
@@ -47,17 +51,23 @@ def open_file():
                 )
                 input_text = input_data[1]
                 if len(input_text) > 2:
-                    info_logger.info(f"{input_text_path}/{input_text_file} opened successfuly")
+                    output_logger.info(
+                        f"{input_text_path}/{input_text_file} opened successfuly"
+                    )
                     return input_data
                 else:
-                    error_logger.error("the entered text must be at least 3 characters")
+                    output_logger.error(
+                        "the entered text must be at least 3 characters"
+                    )
 
             except FileNotFoundError:
-                error_logger.error("FileNotFoundError")
+                output_logger.error("FileNotFoundError")
             except:
-                error_logger.error("Incorrect input file")
+                output_logger.error("Incorrect input file")
         else:
-            error_logger.error("Incorrect input file format. It must be in .txt format")
+            output_logger.error(
+                "Incorrect input file format. It must be in .txt format"
+            )
 
 
 @time_decorator
@@ -75,7 +85,7 @@ def gen_statistic(input_text):
             title = "tab"
         elif item[0] == 32:
             title = "space"
-        elif item[0] == 10 or item[0] == 147 or item[0] == 90 or item[0] == 194:
+        elif item[0] in black_list_of_characters:
             continue
         else:
             title = chr(item[0])
@@ -90,13 +100,15 @@ def gen_statistic(input_text):
 
 @time_decorator
 def gen_str(dict_input, input_text_len):
-    statistic_str = ""
-
+    statistic_str = "statistic\n"
+    i = 0
     for item in dict_input.items():
-        statistic_str += item[0] + ": " + str(item[1]) + "\n"
+        statistic_str += f"{i}) {item[0]}: {item[1]} \n"
+        i += 1
 
-    statistic_str += "\nnumber of input chars: " + str(input_text_len)
-    statistic_str += "\nnumber of different chars: " + str(len(dict_input))
+    statistic_str += "number of input chars: " + str(input_text_len) + "\n"
+    statistic_str += "number of different chars: " + str(len(dict_input)) + "\n"
+
     return statistic_str
 
 
@@ -151,7 +163,9 @@ def main():
     if input_data:
         result = gen_statistic(input_data[1])
         if print_statistic_to_console:
-            print(gen_str(dict_input=result, input_text_len=len(input_data[1])))
+            output_logger.info(
+                gen_str(dict_input=result, input_text_len=len(input_data[1]))
+            )
         if calculate_statistic_visualisation:
             matplotlib_visualisation(
                 result,
