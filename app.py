@@ -119,9 +119,9 @@ def matplotlib_visualisation(
     figure = plt.figure(figsize=(16, 8), dpi=90)
     figure.canvas.manager.set_window_title("char_sense")
     ax = figure.subplots()
-    ax.set_title(file_name)
-    ax.set_xlabel("character")
-    ax.set_ylabel("Percentage of use")
+    ax.set_title(file_name,fontsize=16)
+    ax.set_xlabel("characters", fontsize=14)
+    ax.set_ylabel("Percentage of use", fontsize=14)
 
     if len(result) > num_of_horizontal_divisions:
         while len(result) > num_of_horizontal_divisions - 1:
@@ -149,7 +149,7 @@ def matplotlib_visualisation(
     int_data = [int(item[1]) for item in result.items()]
 
     ax.bar(str_data, int_data, color="#5e1f82")
-    ax.grid(linestyle="dashed", linewidth=1)
+    ax.grid(False)
     if save_statistic_visualisation:
         os.makedirs("statistic_visualisations", exist_ok=True)
         plt.savefig(f"statistic_visualisations/{file_name}_statistic_visualisation.jpg")
@@ -175,4 +175,5 @@ def main():
             )
 
 
-main()
+if __name__ == "__main__":
+    main()
